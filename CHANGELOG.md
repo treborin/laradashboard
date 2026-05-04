@@ -2,9 +2,12 @@
 
 All notable changes to **Lara Dashboard** are documented in this file. This project follows [Semantic Versioning](https://semver.org/).
 
-> **Latest release:** [v1.1.2](https://github.com/laradashboard/laradashboard/releases/tag/v1.1.2) • [View all releases](https://github.com/laradashboard/laradashboard/releases)
+> **Latest release:** [v1.1.3](https://github.com/laradashboard/laradashboard/releases/tag/v1.1.3) • [View all releases](https://github.com/laradashboard/laradashboard/releases)
 
 ---
+## [v1.1.3] — 2026-05-04
+-  **Improve:** Improved file upload component with close button and better error handling.
+-  **Fix:** Fixed minor upgrade issue for demo mode.
 
 ## [v1.1.2] — 2026-04-19
 -  **Fix:** Fixed Module generator command improvement for Windows OS.
