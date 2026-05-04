@@ -96,7 +96,11 @@ Built for Laravel developers who want to ship admin dashboards, SaaS apps, CRMs 
 
 ## 📝 Changelog
 
-> **Latest release:** [v1.1.2](https://github.com/laradashboard/laradashboard/releases/tag/v1.1.2) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
+> **Latest release:** [v1.1.3](https://github.com/laradashboard/laradashboard/releases/tag/v1.1.3) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
+
+**[v1.1.3] — 2026-05-04**
+-   **Improve:** Improved file upload component with close button and better error handling.
+-   **Fix:** Fixed minor upgrade issue for demo mode.
 
 **[v1.1.2] — 2026-04-19**
 -   **Fix:** Module generator command improvement for Windows OS.
