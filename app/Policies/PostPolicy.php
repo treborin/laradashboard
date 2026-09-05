@@ -80,6 +80,15 @@ class PostPolicy extends BasePolicy
     }
 
     /**
+     * Determine whether the user can upload media for the post builder.
+     */
+    public function uploadBuilderMedia(User $user): bool
+    {
+        return $this->checkPermission($user, 'post.create')
+            || $this->checkPermission($user, 'post.edit');
+    }
+
+    /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, Post $post): bool

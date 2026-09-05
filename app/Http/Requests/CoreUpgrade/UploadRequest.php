@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\CoreUpgrade;
 
-use App\Models\Setting;
+use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UploadRequest extends FormRequest
@@ -14,7 +14,13 @@ class UploadRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->can('manageCoreUpgrades', Setting::class) ?? false;
+        $user = $this->user();
+
+        if ($user === null) {
+            return false;
+        }
+
+        return $user->hasRole(Role::SUPERADMIN);
     }
 
     /**

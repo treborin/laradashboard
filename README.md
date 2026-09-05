@@ -96,7 +96,14 @@ Built for Laravel developers who want to ship admin dashboards, SaaS apps, CRMs 
 
 ## 📝 Changelog
 
-> **Latest release:** [v1.3.1](https://github.com/laradashboard/laradashboard/releases/tag/v1.3.1) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
+> **Latest release:** [v1.3.2](https://github.com/laradashboard/laradashboard/releases/tag/v1.3.2) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
+
+**[v1.3.2] — 2026-09-06**
+-   **New:** Dashboard widget customization — per-user show/hide for stat cards and sections.
+-   **Improve:** Lara Builder drag preview, save reliability, and list block UX.
+-   **Fix:** `ModuleStyles` asset scoping and module installation activation edge cases.
+-   **Fix (Security):** Superadmin-only marketplace install and manual core upgrade upload; post builder upload authorization; markdown fetch SSRF hardening.
+-   **Chore:** Dependency updates (`livewire`, `league/commonmark`, `browserslist`, `fast-uri`).
 
 **[v1.3.1] — 2026-08-31**
 -   **Fix:** Password visibility toggle accessibility — `aria-label`, `aria-pressed`, and hide tooltip (#296).

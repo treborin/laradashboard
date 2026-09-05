@@ -681,7 +681,8 @@ class PostController extends Controller
 
         // Update post.
         $post->title = $data['title'];
-        $post->slug = $data['slug'] ?? Str::slug($data['title']);
+        $baseSlug = $data['slug'] ?? Str::slug($data['title']);
+        $post->slug = $this->generateUniqueSlug($baseSlug, $post->id);
         $post->content = $data['content'] ?? '';
         $post->design_json = $data['design_json'] ?? null;
         $post->excerpt = $this->postBuilderService->resolveExcerpt($data['excerpt'] ?? null, $data['content'] ?? null);
@@ -726,12 +727,15 @@ class PostController extends Controller
      */
     public function uploadImage(Request $request, string $postType = 'post'): JsonResponse
     {
+        $this->authorize('uploadBuilderMedia', Post::class);
+
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         $file = $request->file('image');
-        $filename = 'post_' . uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $extension = $this->resolvePostImageExtension($file);
+        $filename = 'post_' . uniqid() . '_' . time() . '.' . $extension;
         $path = $file->storeAs('post-images', $filename, 'public');
 
         return response()->json([
@@ -745,19 +749,21 @@ class PostController extends Controller
      */
     public function uploadVideo(Request $request, string $postType = 'post'): JsonResponse
     {
+        $this->authorize('uploadBuilderMedia', Post::class);
+
         $request->validate([
             'video' => 'required|mimetypes:video/mp4,video/webm,video/ogg,video/quicktime|max:102400',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         $videoFile = $request->file('video');
-        $videoFilename = 'post_video_' . uniqid() . '_' . time() . '.' . $videoFile->getClientOriginalExtension();
+        $videoFilename = 'post_video_' . uniqid() . '_' . time() . '.' . $this->resolvePostVideoExtension($videoFile);
         $videoPath = $videoFile->storeAs('post-videos', $videoFilename, 'public');
 
         $thumbnailUrl = null;
         if ($request->hasFile('thumbnail')) {
             $thumbFile = $request->file('thumbnail');
-            $thumbFilename = 'post_thumb_' . uniqid() . '_' . time() . '.' . $thumbFile->getClientOriginalExtension();
+            $thumbFilename = 'post_thumb_' . uniqid() . '_' . time() . '.' . $this->resolvePostImageExtension($thumbFile);
             $thumbPath = $thumbFile->storeAs('post-videos/thumbnails', $thumbFilename, 'public');
             $thumbnailUrl = asset('storage/' . $thumbPath);
         }
@@ -880,5 +886,25 @@ class PostController extends Controller
         }
 
         return $slug;
+    }
+
+    private function resolvePostImageExtension(\Illuminate\Http\UploadedFile $file): string
+    {
+        return match ($file->getMimeType()) {
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            default => 'jpg',
+        };
+    }
+
+    private function resolvePostVideoExtension(\Illuminate\Http\UploadedFile $file): string
+    {
+        return match ($file->getMimeType()) {
+            'video/webm' => 'webm',
+            'video/ogg' => 'ogv',
+            'video/quicktime' => 'mov',
+            default => 'mp4',
+        };
     }
 }
