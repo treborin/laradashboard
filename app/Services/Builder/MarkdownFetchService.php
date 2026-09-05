@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Builder;
 
+use App\Support\Security\SafeUrlValidator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use League\CommonMark\Environment\Environment;
@@ -18,8 +19,9 @@ class MarkdownFetchService
 {
     private MarkdownConverter $converter;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly SafeUrlValidator $safeUrlValidator
+    ) {
         $environment = new Environment([
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
@@ -42,13 +44,12 @@ class MarkdownFetchService
      */
     public function fetchAndConvert(string $url, bool $useCache = true, int $cacheTtl = 3600): array
     {
-        // Validate URL
-        if (! filter_var($url, FILTER_VALIDATE_URL)) {
-            return ['success' => false, 'error' => 'Invalid URL format'];
-        }
-
         // Convert to raw URL if needed
         $rawUrl = $this->toRawUrl($url);
+
+        if ($error = $this->safeUrlValidator->validateFetchUrl($rawUrl)) {
+            return ['success' => false, 'error' => $error];
+        }
 
         // Check cache
         $cacheKey = 'markdown_fetch:' . md5($rawUrl);
@@ -67,6 +68,7 @@ class MarkdownFetchService
         // Fetch content
         try {
             $response = Http::timeout(30)
+                ->withoutRedirecting()
                 ->withHeaders([
                     'Accept' => 'text/plain, text/markdown, */*',
                     'User-Agent' => 'LaraDashboard-Builder/1.0',
@@ -191,22 +193,12 @@ class MarkdownFetchService
      */
     public function isSupportedSource(string $url): bool
     {
-        $supportedDomains = [
-            'github.com',
-            'raw.githubusercontent.com',
-            'gitlab.com',
-            'bitbucket.org',
-            'gist.github.com',
-            'gist.githubusercontent.com',
-        ];
-
         $host = parse_url($url, PHP_URL_HOST);
 
-        // Allow any URL that ends with .md or is from supported domains
-        if (preg_match('/\.md$/i', parse_url($url, PHP_URL_PATH) ?? '')) {
-            return true;
+        if (! is_string($host) || $host === '') {
+            return false;
         }
 
-        return in_array($host, $supportedDomains, true);
+        return $this->safeUrlValidator->isAllowedHost($host);
     }
 }
