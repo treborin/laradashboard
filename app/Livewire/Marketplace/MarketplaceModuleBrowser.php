@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Marketplace;
 
+use App\Models\Module;
 use App\Services\Modules\MarketplaceService;
 use App\Services\Modules\ModuleService;
 use Illuminate\Support\Facades\Log;
@@ -75,6 +76,8 @@ class MarketplaceModuleBrowser extends Component
 
     public function installModule(string $slug, string $version): void
     {
+        $this->authorize('create', Module::class);
+
         if (config('app.demo_mode', false)) {
             $this->dispatch('notify', [
                 'variant' => 'error',

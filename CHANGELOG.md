@@ -2,9 +2,20 @@
 
 All notable changes to **Lara Dashboard** are documented in this file. This project follows [Semantic Versioning](https://semver.org/).
 
-> **Latest release:** [v1.3.1](https://github.com/laradashboard/laradashboard/releases/tag/v1.3.1) • [View all releases](https://github.com/laradashboard/laradashboard/releases)
+> **Latest release:** [v1.3.2](https://github.com/laradashboard/laradashboard/releases/tag/v1.3.2) • [View all releases](https://github.com/laradashboard/laradashboard/releases)
 
 ---
+
+## [v1.3.2] — 2026-09-06
+- **New:** Dashboard widget customization — per-user show/hide for stat cards and dashboard sections via the new widget customizer panel.
+- **Improve:** Lara Builder drag preview, pending-save flush, clearer save-error handling, and list block styling/reliability.
+- **Fix:** `ModuleStyles` component — tighter asset scoping, broader manifest coverage, and safer module CSS loading when builds are missing.
+- **Fix:** Module replace/install activation edge cases during marketplace and upload flows.
+- **Fix (Security):** Marketplace Livewire install now requires Superadmin (`ModulePolicy::create`), closing unauthorized module install and auto-activation.
+- **Fix (Security):** Post builder image/video uploads require `post.create` or `post.edit`; stored extensions derive from detected MIME type (blocks `.pht` and similar bypasses).
+- **Fix (Security):** Manual core upgrade ZIP upload restricted to Superadmin (marketplace-driven upgrades unchanged for `settings.edit`).
+- **Fix (Security):** Builder markdown fetch hardened against SSRF — git-host allowlist, private/reserved IP blocking, no redirect following, and builder permission gate on API routes.
+- **Chore:** Dependency updates — `livewire/livewire` 4.3.4, `league/commonmark` 2.10.0, `browserslist` 4.28.8, `fast-uri` 3.1.7.
 
 ## [v1.3.1] — 2026-08-31
 - **Fix:** Password visibility toggle — dynamic `aria-label`, `aria-pressed`, and separate hide tooltip for screen readers (#296).

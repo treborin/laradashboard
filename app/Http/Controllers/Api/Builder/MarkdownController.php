@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Builder;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Builder\MarkdownConvertRequest;
+use App\Http\Requests\Builder\MarkdownConvertUrlRequest;
+use App\Http\Requests\Builder\MarkdownFetchRequest;
 use App\Services\Builder\MarkdownFetchService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class MarkdownController extends Controller
 {
@@ -19,14 +21,9 @@ class MarkdownController extends Controller
     /**
      * Fetch markdown from URL and return HTML.
      */
-    public function fetch(Request $request): JsonResponse
+    public function fetch(MarkdownFetchRequest $request): JsonResponse
     {
-        $request->validate([
-            'url' => ['required', 'url', 'max:2048'],
-            'refresh' => ['sometimes', 'boolean'],
-        ]);
-
-        $url = $request->input('url');
+        $url = $request->validated('url');
         $refresh = $request->boolean('refresh', false);
 
         // Clear cache if refresh requested
@@ -55,13 +52,9 @@ class MarkdownController extends Controller
     /**
      * Convert markdown content to HTML.
      */
-    public function convert(Request $request): JsonResponse
+    public function convert(MarkdownConvertRequest $request): JsonResponse
     {
-        $request->validate([
-            'content' => ['required', 'string', 'max:500000'],
-        ]);
-
-        $content = $request->input('content');
+        $content = $request->validated('content');
         $result = $this->markdownService->convertMarkdown($content);
 
         if (! $result['success']) {
@@ -80,13 +73,9 @@ class MarkdownController extends Controller
     /**
      * Convert a repository URL to raw content URL (for preview).
      */
-    public function convertUrl(Request $request): JsonResponse
+    public function convertUrl(MarkdownConvertUrlRequest $request): JsonResponse
     {
-        $request->validate([
-            'url' => ['required', 'url', 'max:2048'],
-        ]);
-
-        $url = $request->input('url');
+        $url = $request->validated('url');
         $rawUrl = $this->markdownService->toRawUrl($url);
         $isSupported = $this->markdownService->isSupportedSource($url);
 

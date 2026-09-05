@@ -1,9 +1,10 @@
 <?php
 
 use App\Services\Builder\MarkdownFetchService;
+use App\Support\Security\SafeUrlValidator;
 
 beforeEach(function () {
-    $this->service = new MarkdownFetchService();
+    $this->service = new MarkdownFetchService(new SafeUrlValidator());
 });
 
 describe('toRawUrl', function () {
@@ -69,9 +70,9 @@ describe('isSupportedSource', function () {
         expect($this->service->isSupportedSource('https://bitbucket.org/user/repo/src/main/README.md'))->toBeTrue();
     });
 
-    test('recognizes any .md file URL as supported', function () {
-        expect($this->service->isSupportedSource('https://example.com/docs/readme.md'))->toBeTrue();
-        expect($this->service->isSupportedSource('https://custom.domain.com/path/to/file.MD'))->toBeTrue();
+    test('rejects unsupported hosts even when path ends with .md', function () {
+        expect($this->service->isSupportedSource('https://example.com/docs/readme.md'))->toBeFalse();
+        expect($this->service->isSupportedSource('https://custom.domain.com/path/to/file.MD'))->toBeFalse();
     });
 
     test('rejects non-markdown URLs from unsupported domains', function () {
@@ -141,5 +142,19 @@ describe('fetchAndConvert', function () {
 
         expect($result['success'])->toBeFalse();
         expect($result['error'])->toBe('Invalid URL format');
+    });
+
+    test('blocks private network targets', function () {
+        $result = $this->service->fetchAndConvert('http://127.0.0.1/secret.txt');
+
+        expect($result['success'])->toBeFalse();
+        expect($result['error'])->toBe('URL host is not allowed');
+    });
+
+    test('blocks unsupported external hosts', function () {
+        $result = $this->service->fetchAndConvert('https://example.com/readme.md');
+
+        expect($result['success'])->toBeFalse();
+        expect($result['error'])->toBe('URL host is not allowed');
     });
 });
