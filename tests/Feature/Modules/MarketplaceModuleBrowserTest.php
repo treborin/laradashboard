@@ -3,9 +3,12 @@
 declare(strict_types=1);
 
 use App\Livewire\Marketplace\MarketplaceModuleBrowser;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Permission;
 
 pest()->use(RefreshDatabase::class);
 
@@ -75,7 +78,14 @@ test('marketplace browser resets page on search', function () {
 test('marketplace browser blocks install in demo mode', function () {
     config(['app.demo_mode' => true]);
 
-    Livewire::test(MarketplaceModuleBrowser::class)
+    $superadmin = User::factory()->create();
+    $role = Role::firstOrCreate(['name' => Role::SUPERADMIN, 'guard_name' => 'web']);
+    Permission::firstOrCreate(['name' => 'module.create', 'guard_name' => 'web']);
+    $superadmin->assignRole($role);
+    $superadmin->syncPermissions(['module.create']);
+
+    Livewire::actingAs($superadmin)
+        ->test(MarketplaceModuleBrowser::class)
         ->call('loadModules')
         ->call('installModule', 'test-module', '1.0.0')
         ->assertDispatched('notify', fn (string $name, array $params) => $params[0]['variant'] === 'error');
