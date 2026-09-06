@@ -55,7 +55,7 @@ class CoreBriefingProvider implements BriefingProviderInterface
             $items[] = $this->pendingInboundEmailsItem();
         }
 
-        return array_values(array_filter($items));
+        return $items;
     }
 
     protected function pendingPostsItem(): BriefingItem

@@ -56,7 +56,7 @@ class ListEmailTemplatesTool extends Tool
         );
 
         return Response::json([
-            'data' => $templates->getCollection()->map(fn ($template) => [
+            'data' => collect($templates->items())->map(fn ($template) => [
                 'id' => $template->id,
                 'uuid' => $template->uuid,
                 'name' => $template->name,
