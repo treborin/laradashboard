@@ -109,7 +109,21 @@
 
             {!! Hook::applyFilters(AuthFilterHook::REGISTER_FORM_FIELDS_AFTER, '') !!}
 
-            <x-recaptcha page="registration" />
+            @if(app(\App\Services\Auth\RegistrationGuardService::class)->isHoneypotEnabled())
+                <div class="absolute left-[-9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+                    <label for="company_website">{{ __('Company website') }}</label>
+                    <input
+                        type="text"
+                        id="company_website"
+                        name="company_website"
+                        tabindex="-1"
+                        autocomplete="off"
+                        value=""
+                    />
+                </div>
+            @endif
+
+            <x-recaptcha page="register" />
 
             {!! Hook::applyFilters(AuthFilterHook::REGISTER_FORM_FIELDS_BEFORE_SUBMIT, '') !!}
 

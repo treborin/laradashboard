@@ -41,6 +41,11 @@ enum SettingFilterHook: string
     case SETTINGS_AI_INTEGRATIONS_TAB_BEFORE_SECTION_END = 'filter.settings.ai_integrations_tab_before_section_end';
     case SETTINGS_AI_INTEGRATIONS_TAB_AFTER_SECTION_END = 'filter.settings.ai_integrations_tab_after_section_end';
 
+    // MCP settings tab hooks
+    case SETTINGS_MCP_TAB_BEFORE_SECTION_START = 'filter.settings.mcp_tab_before_section_start';
+    case SETTINGS_MCP_TAB_BEFORE_SECTION_END = 'filter.settings.mcp_tab_before_section_end';
+    case SETTINGS_MCP_TAB_AFTER_SECTION_END = 'filter.settings.mcp_tab_after_section_end';
+
     // UI Hooks - reCAPTCHA tab
     case SETTINGS_RECAPTCHA_INTEGRATIONS_TAB_BEFORE_SECTION_START = 'filter.settings.recaptcha_integrations_tab_before_section_start';
     case SETTINGS_RECAPTCHA_INTEGRATIONS_TAB_BEFORE_SECTION_END = 'filter.settings.recaptcha_integrations_tab_before_section_end';

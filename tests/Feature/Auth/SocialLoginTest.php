@@ -58,6 +58,12 @@ test('social login redirect returns error for invalid provider', function () {
 });
 
 test('social login callback creates new user when user does not exist', function () {
+    Setting::create([
+        'option_name' => 'auth_enable_public_registration',
+        'option_value' => '1',
+    ]);
+    config(['settings.auth_enable_public_registration' => '1']);
+
     $socialiteUser = Mockery::mock(SocialiteUser::class);
     $socialiteUser->shouldReceive('getId')->andReturn('12345');
     $socialiteUser->shouldReceive('getEmail')->andReturn('newuser@example.com');

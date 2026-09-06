@@ -2,9 +2,15 @@
 
 All notable changes to **Lara Dashboard** are documented in this file. This project follows [Semantic Versioning](https://semver.org/).
 
-> **Latest release:** [v1.3.2](https://github.com/laradashboard/laradashboard/releases/tag/v1.3.2) • [View all releases](https://github.com/laradashboard/laradashboard/releases)
+> **Latest release:** [v1.4.0](https://github.com/laradashboard/laradashboard/releases/tag/v1.4.0) • [View all releases](https://github.com/laradashboard/laradashboard/releases)
 
 ---
+
+## [v1.4.0] — 2026-09-07
+- **New:** LaraDashboard MCP server — connect Cursor, Claude, and other MCP agents to manage content, CRM, forms, email, cache, logs, and daily briefings from **Settings → MCP**.
+- **New:** MCP agent tokens with ability-scoped permissions (`McpFilterHook` registry for core and module tools).
+- **New:** Core MCP tools — posts, SEO meta, email templates, daily briefing, cache clear, and storage log listing.
+- **Improve:** Module vendor autoload guard on Laravel 13+ (prevents stale Illuminate copies from breaking Eloquent).
 
 ## [v1.3.2] — 2026-09-06
 - **New:** Dashboard widget customization — per-user show/hide for stat cards and dashboard sections via the new widget customizer panel.

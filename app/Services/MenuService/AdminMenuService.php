@@ -204,7 +204,7 @@ class AdminMenuService
             'label' => __('Settings'),
             'icon' => 'lucide:settings',
             'id' => 'settings-submenu',
-            'active' => Route::is('admin.settings.*') || Route::is('admin.translations.*') || Route::is('admin.email-templates.*') || Route::is('admin.notifications.*') || Route::is('admin.email-settings.*') || Route::is('admin.email-connections.*') || Route::is('admin.menus.*'),
+            'active' => Route::is('admin.settings.*') || Route::is('admin.translations.*') || Route::is('admin.email-templates.*') || Route::is('admin.notifications.*') || Route::is('admin.email-settings.*') || Route::is('admin.email-connections.*') || Route::is('admin.menus.*') || Route::is('admin.core-upgrades.*'),
             'priority' => 40,
             'permissions' => ['settings.edit', 'translations.view', 'menu.view'],
             'children' => [
@@ -213,6 +213,13 @@ class AdminMenuService
                     'route' => route('admin.settings.index'),
                     'active' => Route::is('admin.settings.index'),
                     'priority' => 20,
+                    'permissions' => 'settings.edit',
+                ],
+                [
+                    'label' => __('MCP'),
+                    'route' => route('admin.settings.mcp.index'),
+                    'active' => Route::is('admin.settings.mcp.*'),
+                    'priority' => 22,
                     'permissions' => 'settings.edit',
                 ],
                 [

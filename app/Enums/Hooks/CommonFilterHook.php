@@ -29,4 +29,8 @@ enum CommonFilterHook: string
     case RECAPTCHA_POST_VERIFICATION = 'filter.recaptcha_post_verification';
     case RECAPTCHA_VERIFICATION_EXCEPTION = 'filter.recaptcha_verification_exception';
     case RECAPTCHA_AVAILABLE_PAGES = 'filter.recaptcha_available_pages';
+
+    // Registration anti-spam
+    case REGISTRATION_GUARD_VALIDATION_RULES = 'filter.registration_guard.validation_rules';
+    case REGISTRATION_SPAM_NAME_PATTERNS = 'filter.registration_guard.spam_name_patterns';
 }

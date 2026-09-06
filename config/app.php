@@ -246,6 +246,7 @@ return [
         App\Providers\HookServiceProvider::class,
         App\Providers\BuilderServiceProvider::class,
         App\Providers\AuthSettingsServiceProvider::class,
+        App\Providers\McpSettingsServiceProvider::class,
         App\Ai\Providers\AiServiceProvider::class,
         App\Providers\CustomTranslationServiceProvider::class,
     ],

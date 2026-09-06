@@ -97,6 +97,96 @@
 
 <x-card class="mt-6">
     <x-slot name="header">
+        {{ __('Registration Security') }}
+    </x-slot>
+    <x-slot name="headerDescription">
+        {{ __('Reduce bot registrations and email abuse without blocking legitimate users.') }}
+    </x-slot>
+
+    <div class="space-y-6">
+        <div class="relative">
+            <label class="flex items-center gap-3">
+                <input
+                    type="checkbox"
+                    name="auth_registration_honeypot_enabled"
+                    value="1"
+                    @if(filter_var(config('settings.auth_registration_honeypot_enabled', '1'), FILTER_VALIDATE_BOOLEAN)) checked @endif
+                    class="form-checkbox rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700"
+                >
+                <div>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ __('Enable registration honeypot') }}
+                    </span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ __('Adds a hidden field that bots often fill in. Real users never see it.') }}
+                    </p>
+                </div>
+            </label>
+        </div>
+
+        <div class="relative">
+            <label class="flex items-center gap-3">
+                <input
+                    type="checkbox"
+                    name="auth_registration_ip_limit_enabled"
+                    value="1"
+                    @if(filter_var(config('settings.auth_registration_ip_limit_enabled', '1'), FILTER_VALIDATE_BOOLEAN)) checked @endif
+                    class="form-checkbox rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700"
+                >
+                <div>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ __('Limit registrations per IP address') }}
+                    </span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ __('Caps how many accounts can be created from the same IP in 24 hours.') }}
+                    </p>
+                </div>
+            </label>
+        </div>
+
+        <div class="relative max-w-xs">
+            <label class="form-label" for="auth_registration_max_per_ip_per_day">
+                {{ __('Max registrations per IP (24h)') }}
+            </label>
+            <input
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                name="auth_registration_max_per_ip_per_day"
+                id="auth_registration_max_per_ip_per_day"
+                value="{{ config('settings.auth_registration_max_per_ip_per_day', 3) }}"
+                class="form-control"
+            />
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {{ __('Use 0 to disable the daily cap while keeping other protections active.') }}
+            </p>
+        </div>
+
+        <div class="relative">
+            <label class="flex items-center gap-3">
+                <input
+                    type="checkbox"
+                    name="auth_defer_welcome_email_until_verified"
+                    value="1"
+                    @if(filter_var(config('settings.auth_defer_welcome_email_until_verified', '1'), FILTER_VALIDATE_BOOLEAN)) checked @endif
+                    class="form-checkbox rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700"
+                >
+                <div>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ __('Skip welcome email until email is verified') }}
+                    </span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ __('When email verification is required, only send the verification email — not the welcome email — at signup.') }}
+                    </p>
+                </div>
+            </label>
+        </div>
+    </div>
+</x-card>
+
+<x-card class="mt-6">
+    <x-slot name="header">
         {{ __('Login Security') }}
     </x-slot>
     <x-slot name="headerDescription">

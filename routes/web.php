@@ -15,6 +15,8 @@ use App\Http\Controllers\Backend\EmailTemplateController;
 use App\Http\Controllers\Backend\InboundEmailConnectionController;
 use App\Http\Controllers\Backend\LocaleController;
 use App\Http\Controllers\Backend\MediaController;
+use App\Http\Controllers\Backend\McpSettingsController;
+use App\Http\Controllers\Backend\McpTokenController;
 use App\Http\Controllers\Backend\ModuleController;
 use App\Http\Controllers\Backend\NotificationController;
 use App\Http\Controllers\Backend\SendTestEmailController;
@@ -24,6 +26,7 @@ use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\MenuController;
 use App\Http\Controllers\Backend\RoleController;
 use App\Http\Controllers\Backend\SettingController;
+use App\Http\Controllers\Backend\StorageLogController;
 use App\Http\Controllers\Backend\TermController;
 use App\Http\Controllers\Backend\ThemeController;
 use App\Http\Controllers\Backend\TranslationController;
@@ -113,6 +116,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'v
         Route::get('/', [SettingController::class, 'index'])->name('settings.index');
         Route::post('/', [SettingController::class, 'store'])->name('settings.store');
         Route::delete('/remove-image', [SettingController::class, 'removeImage'])->name('settings.remove-image');
+        Route::get('logs/download', [StorageLogController::class, 'download'])->name('settings.logs.download');
+
+        Route::get('mcp', [McpSettingsController::class, 'index'])->name('settings.mcp.index');
+        Route::post('mcp/tokens', [McpTokenController::class, 'store'])->name('settings.mcp.tokens.store');
+        Route::delete('mcp/tokens/{tokenId}', [McpTokenController::class, 'destroy'])->name('settings.mcp.tokens.destroy');
 
         // Email Settings Management Routes.
         Route::get('emails', [EmailSettingController::class, 'index'])->name('email-settings.index');
