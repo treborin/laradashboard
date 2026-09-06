@@ -7,4 +7,6 @@
     <livewire:components.cache-manager />
 </div>
 
+<x-settings.logs-section />
+
 {!! Hook::applyFilters(SettingFilterHook::SETTINGS_PERFORMANCE_SECURITY_TAB_AFTER_SECTION_END, '') !!}

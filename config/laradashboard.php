@@ -14,7 +14,7 @@ return [
 
     'marketplace' => [
         /*
-         * The base URL of the LaraDashboard marketplace.
+         * The base URL of the Lara Dashboard marketplace.
          */
         'url' => env('MARKETPLACE_URL', 'https://laradashboard.com'),
 

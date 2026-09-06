@@ -6,7 +6,7 @@
 
 # ⚡ Lara Dashboard
 
-### Open-source Laravel Admin Panel, CMS & Modular Starter Kit — powered by Laravel 13, Livewire 3, Tailwind CSS v4 and an AI Agent.
+### Open-source Laravel Admin Panel, CMS & Modular Starter Kit — powered by Laravel 13, Livewire 3, Tailwind CSS v4, built-in MCP for AI agents, and inline AI content tools.
 
 [![Latest Release][release-shield]][release-url]
 [![PHP Version][php-shield]][php-url]
@@ -25,7 +25,7 @@
 
 ---
 
-**Lara Dashboard** is a **production-ready Laravel admin panel and headless CMS** — a batteries-included **Laravel boilerplate / starter kit** with Users, Roles, Permissions (RBAC via Spatie), Modules, Settings, Translations, Posts & Pages, Media Library, **REST API**, AI content generation, and a **WordPress-style hooks system** (via [eventy](https://github.com/tormjens/eventy)) for extensibility.
+**Lara Dashboard** is a **production-ready Laravel admin panel and headless CMS** — a batteries-included **Laravel boilerplate / starter kit** with Users, Roles, Permissions (RBAC via Spatie), Modules, Settings, Translations, Posts & Pages, Media Library, **REST API**, **MCP server for AI agents** (Cursor, Claude Desktop, Claude Code), AI content generation, and a **WordPress-style hooks system** (via [eventy](https://github.com/tormjens/eventy)) for extensibility.
 
 Built for Laravel developers who want to ship admin dashboards, SaaS apps, CRMs and internal tools in **hours, not weeks** — without trading away Laravel idioms, testability or type-safety.
 
@@ -38,7 +38,8 @@ Built for Laravel developers who want to ship admin dashboards, SaaS apps, CRMs 
 -   🧩 **Modular Architecture** — Self-contained modules via [nwidart/laravel-modules](https://laravelmodules.com/). Install, enable, disable, zip and distribute with a single command.
 -   ⚡ **CRUD Generator** — `php artisan module:make-crud` scaffolds Model, Migration, Service, FormRequest, Controller, Datatable, Views, Routes, Menu and Tests in one pass.
 -   📝 **Full CMS** — Posts, Pages, Categories, Tags, Media Library, visual block-based editor with drag-and-drop.
--   🤖 **AI Agent built-in** — Configure OpenAI, Anthropic, Gemini and more via filter hooks. Generate and refine content inline.
+-   🤖 **Develop & manage with AI (MCP)** — Connect **Cursor**, **Claude Desktop**, or **Claude Code** to your site. Create posts, review CRM leads, send emails, search docs, clear cache, and run daily briefings from natural language — with token-based, permission-scoped access from **Settings → MCP**.
+-   ✍️ **Inline AI content** — Configure OpenAI, Anthropic, Gemini and more via filter hooks. Generate and refine content inside the admin and builder.
 -   📧 **Email System** — Inbound/outbound SMTP connections, visual email template builder, campaign tracking, notifications.
 -   🌐 **i18n Out-of-the-box** — 21 languages preloaded, chunked translation management, one-click language adds.
 -   🔌 **REST API** — Auto-documented with [Scramble](https://github.com/dedoc/scramble), Sanctum-auth, ready for mobile apps and SPAs.
@@ -47,7 +48,51 @@ Built for Laravel developers who want to ship admin dashboards, SaaS apps, CRMs 
 -   🧪 **Tests & Static Analysis** — Pest, PHPStan (Larastan), Rector, Pint — all wired up out of the box.
 -   📦 **Zero-friction Deploy** — cPanel/shared-hosting ready, ZIP distribution with vendor folder, one-click core upgrades with backup/restore.
 
+## 🤖 Develop & Manage Your Site with AI (MCP)
+
+Lara Dashboard ships a **built-in [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server** so AI coding assistants can operate your site like a power user — not just write code about it.
+
+Connect **Cursor** (Desktop or CLI), **Claude Desktop**, or **Claude Code**, generate an MCP agent token in **Settings → MCP**, and ask your assistant to manage day-to-day work: draft and publish posts, triage form submissions, update CRM records, send templated email, inspect logs, and more. Installed modules can expose their own tools through the **`McpFilterHook`** registry.
+
+**What you can do from Cursor, Claude, or similar clients**
+
+| Area | Examples |
+| --- | --- |
+| **Content** | List, create, and update posts; generate SEO meta |
+| **CRM** | Contacts, deals, tickets, and activities *(CRM module)* |
+| **Forms** | Review new submissions and mark them viewed *(Forms module)* |
+| **Email** | List templates and send mail to users or contacts |
+| **Operations** | Daily briefing, clear cache, list storage log files |
+| **Docs** | Search and read LaraDashboard guides *(DocForge module)* |
+
+**Quick start**
+
+1. Open **Settings → MCP**, enable the MCP server, and save.
+2. Click **Generate MCP token** and copy the token (shown once).
+3. Add the server config to your AI client — the admin UI includes ready-made JSON for Cursor, Claude Desktop, and Claude Code.
+
+Example config for **Cursor** (`~/.cursor/mcp.json` or project `.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "laradashboard": {
+      "url": "https://your-site.test/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_MCP_AGENT_TOKEN"
+      }
+    }
+  }
+}
+```
+
+For local development, you can store the token in an env var (`LARADASHBOARD_MCP_TOKEN`) and reference it from the config snippet in **Settings → MCP**.
+
+> **Note:** The MCP endpoint returns 404 until MCP is enabled in settings. Regular API login tokens do not work — use a dedicated MCP agent token with the abilities you choose.
+
 ## 📚 Table of Contents
+
+-   [Develop & Manage with AI (MCP)](#-develop--manage-your-site-with-ai-mcp)
 
 -   [Requirements](#-requirements)
 -   [Built With](#️-built-with)
@@ -96,7 +141,11 @@ Built for Laravel developers who want to ship admin dashboards, SaaS apps, CRMs 
 
 ## 📝 Changelog
 
-> **Latest release:** [v1.3.2](https://github.com/laradashboard/laradashboard/releases/tag/v1.3.2) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
+> **Latest release:** [v1.4.0](https://github.com/laradashboard/laradashboard/releases/tag/v1.4.0) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
+
+**[v1.4.0] — 2026-09-07**
+-   **New:** MCP server for AI agents — token-based access from **Settings → MCP** with tools for content, CRM, forms, email, docs, cache, and logs.
+-   **New:** Module MCP registry (`McpFilterHook`) so installed modules can expose tools and briefing providers.
 
 **[v1.3.2] — 2026-09-06**
 -   **New:** Dashboard widget customization — per-user show/hide for stat cards and sections.
@@ -358,6 +407,7 @@ git remote set-url origin git@github.com:laradashboard/laradashboard.git
 1. Custom Error Pages - 404, 500, 503, 403
 1. Content Management System - Add/Edit/Delete Content, Content Category, Content Tag
 1. AI Content Generation - Configure AI providers (OpenAI, Anthropic, etc.) for content generation
+1. MCP Server - Connect Cursor, Claude Desktop, or Claude Code; manage content, CRM, forms, email, cache, and logs from AI agents (**Settings → MCP**)
 1. Email Management - Email connections, email templates with visual builder, notifications
 1. Detail Pages - User, Role, Permission, Module detail views with comprehensive information
 1. REST API — auto-documented REST endpoints for Users, Roles, Permissions, Settings, Translations, and Content (Post / Page / Category / Tag).
@@ -657,6 +707,8 @@ Visit the [Laravel Boost documentation](https://github.com/laravel/boost).
     </td>
   </tr>
 </table>
+
+Use inline AI inside the admin for drafting and editing. For full site management from **Cursor**, **Claude Desktop**, or **Claude Code**, enable the MCP server under **Settings → MCP** — see [Develop & Manage with AI (MCP)](#-develop--manage-your-site-with-ai-mcp) above.
 
 ### 📧 Email Management
 

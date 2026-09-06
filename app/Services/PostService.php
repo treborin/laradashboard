@@ -103,11 +103,12 @@ class PostService
             'title' => $data['title'],
             'slug' => $data['slug'] ?? str()->slug($data['title']),
             'content' => $data['content'] ?? '',
+            'design_json' => $data['design_json'] ?? null,
             'excerpt' => $data['excerpt'] ?? '',
             'post_type' => $data['post_type'] ?? 'post',
             'status' => $data['status'] ?? PostStatus::DRAFT->value,
             'published_at' => $data['published_at'] ?? null,
-            'author_id' => $data['author_id'],
+            'user_id' => $data['user_id'] ?? $data['author_id'] ?? null,
         ]);
 
         // Handle featured image upload to media library.
@@ -143,6 +144,7 @@ class PostService
             'title' => $data['title'] ?? $post->title,
             'slug' => $data['slug'] ?? $post->slug,
             'content' => $data['content'] ?? $post->content,
+            'design_json' => $data['design_json'] ?? $post->design_json,
             'excerpt' => $data['excerpt'] ?? $post->excerpt,
             'status' => $data['status'] ?? $post->status,
             'published_at' => $data['published_at'] ?? $post->published_at,

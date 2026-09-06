@@ -79,7 +79,6 @@ class CoreZipCommand extends Command
         'vendor/daverandom',
 
         // Module-specific dependencies (modules have their own vendor)
-        'vendor/laravel/scout',
 
         // IDE / Editor
         '.DS_Store',

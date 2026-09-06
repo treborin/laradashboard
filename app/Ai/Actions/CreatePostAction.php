@@ -9,6 +9,7 @@ use App\Ai\Data\AiResult;
 use App\Models\Post;
 use App\Services\AiContentGeneratorService;
 use App\Services\Builder\BlockService;
+use App\Services\Builder\PostImageService;
 use Exception;
 use Illuminate\Support\Str;
 
@@ -20,7 +21,8 @@ class CreatePostAction implements AiActionInterface
 {
     public function __construct(
         private AiContentGeneratorService $aiService,
-        private BlockService $blockService
+        private BlockService $blockService,
+        private PostImageService $postImageService,
     ) {
     }
 
@@ -160,18 +162,18 @@ class CreatePostAction implements AiActionInterface
             $generatedImages = [];
             $imageError = null;
 
-            if ($includeImages && $this->aiService->canGenerateImages()) {
+            if ($includeImages && $this->postImageService->canGenerate()) {
                 $progress(__('Generating images...'), 'in_progress', [
                     'phase' => 'images',
                     'count' => $imageCount,
                 ]);
 
                 try {
-                    $generatedImages = $this->generateImagesForPostWithProgress(
-                        $content,
-                        $topic,
-                        $imageCount,
-                        $progress
+                    $generatedImages = $this->postImageService->generateImages(
+                        topic: $topic,
+                        title: (string) ($content['title'] ?? $topic),
+                        count: $imageCount,
+                        imageSuggestions: $content['image_suggestions'] ?? [],
                     );
 
                     if (count($generatedImages) > 0) {
@@ -209,7 +211,7 @@ class CreatePostAction implements AiActionInterface
                     $message = __(':type created, but image generation failed. You can add images manually.', ['type' => $contentTypeLabelUcfirst]);
                     $status = 'partial';
                     $completedSteps[] = __('Image generation skipped: :reason', ['reason' => Str::limit($imageError, 50)]);
-                } elseif (! $this->aiService->canGenerateImages()) {
+                } elseif (! $this->postImageService->canGenerate()) {
                     $message = __(':type created. Image generation requires OpenAI API key.', ['type' => $contentTypeLabelUcfirst]);
                     $status = 'partial';
                     $completedSteps[] = __('Image generation not available (OpenAI key not configured)');
@@ -242,101 +244,6 @@ class CreatePostAction implements AiActionInterface
 
             return AiResult::failed(__('Failed to create :type: :error', ['type' => $contentTypeLabel ?? 'post', 'error' => $e->getMessage()]));
         }
-    }
-
-    /**
-     * Generate images with progress reporting.
-     *
-     * @return array<int, array{url: string, alt: string}>
-     */
-    private function generateImagesForPostWithProgress(array $content, string $topic, int $count, ?callable $progress): array
-    {
-        $images = [];
-
-        // Get image suggestions from content if available
-        $imageSuggestions = $content['image_suggestions'] ?? [];
-
-        // If no suggestions, create generic prompts based on topic
-        if (empty($imageSuggestions)) {
-            $imageSuggestions = $this->generateImagePrompts($topic, $content['title'] ?? $topic, $count);
-        }
-
-        // Limit to requested count
-        $imageSuggestions = array_slice($imageSuggestions, 0, $count);
-        $total = count($imageSuggestions);
-
-        foreach ($imageSuggestions as $index => $suggestion) {
-            $imageNum = $index + 1;
-
-            if ($progress) {
-                $progress(
-                    __('Generating image :num of :total...', ['num' => $imageNum, 'total' => $total]),
-                    'in_progress',
-                    ['phase' => 'images', 'current' => $imageNum, 'total' => $total]
-                );
-            }
-
-            $prompt = is_array($suggestion) ? ($suggestion['prompt'] ?? $suggestion['description'] ?? $topic) : $suggestion;
-            $alt = is_array($suggestion) ? ($suggestion['alt'] ?? $prompt) : $prompt;
-
-            // Generate the image
-            $result = $this->aiService->generateImage($prompt, '1792x1024');
-
-            if ($result && ! empty($result['url'])) {
-                if ($progress) {
-                    $progress(
-                        __('Saving image :num...', ['num' => $imageNum]),
-                        'in_progress',
-                        ['phase' => 'images', 'current' => $imageNum, 'total' => $total]
-                    );
-                }
-
-                // Download and store the image locally (DALL-E URLs expire)
-                $localUrl = $this->aiService->downloadAndStoreImage($result['url']);
-
-                if ($localUrl) {
-                    $images[] = [
-                        'url' => $localUrl,
-                        'alt' => Str::limit($alt, 100),
-                    ];
-
-                    if ($progress) {
-                        $progress(
-                            __('Image :num generated', ['num' => $imageNum]),
-                            'completed',
-                            ['phase' => 'images', 'current' => $imageNum, 'total' => $total]
-                        );
-                    }
-                }
-            }
-        }
-
-        return $images;
-    }
-
-    /**
-     * Generate image prompts based on topic and title.
-     *
-     * @return array<int, string>
-     */
-    private function generateImagePrompts(string $topic, string $title, int $count): array
-    {
-        $prompts = [];
-
-        // Featured/header image
-        $prompts[] = "A professional, visually appealing header image for a blog post about: {$topic}. Modern, clean design suitable for web content.";
-
-        if ($count >= 2) {
-            // Supporting illustration
-            $prompts[] = "An illustrative image that visually explains concepts related to: {$topic}. Clear, informative, suitable for educational content.";
-        }
-
-        if ($count >= 3) {
-            // Conclusion/call-to-action image
-            $prompts[] = "An inspiring, engaging image to conclude an article about: {$topic}. Motivational and professional.";
-        }
-
-        return array_slice($prompts, 0, $count);
     }
 
     /**
