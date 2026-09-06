@@ -6,7 +6,7 @@ All notable changes to **Lara Dashboard** are documented in this file. This proj
 
 ---
 
-## [v1.4.0] — 2026-09-06
+## [v1.4.0] — 2026-09-07
 - **New:** LaraDashboard MCP server — connect Cursor, Claude, and other MCP agents to manage content, CRM, forms, email, cache, logs, and daily briefings from **Settings → MCP**.
 - **New:** MCP agent tokens with ability-scoped permissions (`McpFilterHook` registry for core and module tools).
 - **New:** Core MCP tools — posts, SEO meta, email templates, daily briefing, cache clear, and storage log listing.

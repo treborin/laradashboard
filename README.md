@@ -143,7 +143,7 @@ For local development, you can store the token in an env var (`LARADASHBOARD_MCP
 
 > **Latest release:** [v1.4.0](https://github.com/laradashboard/laradashboard/releases/tag/v1.4.0) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
 
-**[v1.4.0] — 2026-09-06**
+**[v1.4.0] — 2026-09-07**
 -   **New:** MCP server for AI agents — token-based access from **Settings → MCP** with tools for content, CRM, forms, email, docs, cache, and logs.
 -   **New:** Module MCP registry (`McpFilterHook`) so installed modules can expose tools and briefing providers.
 
