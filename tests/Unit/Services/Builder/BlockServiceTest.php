@@ -565,6 +565,33 @@ describe('renderBlock', function () {
     });
 });
 
+describe('buildBlocksFromHtml', function () {
+    test('converts html headings and paragraphs into builder blocks', function () {
+        $blocks = $this->blockService->buildBlocksFromHtml(
+            '<h2>Section Title</h2><p>Paragraph with <strong>bold</strong> text.</p>'
+        );
+
+        expect($blocks)->not->toBeEmpty()
+            ->and(collect($blocks)->pluck('type')->all())->toContain('heading', 'text')
+            ->and(collect($blocks)->firstWhere('type', 'heading')['props']['text'])->toBe('Section Title')
+            ->and(collect($blocks)->firstWhere('type', 'text')['props']['content'])->toContain('<strong>bold</strong>');
+    });
+
+    test('converts plain text paragraphs into builder blocks', function () {
+        $blocks = $this->blockService->buildBlocksFromHtml("First paragraph.\n\nSecond paragraph.");
+
+        expect(collect($blocks)->where('type', 'text')->count())->toBe(2);
+    });
+
+    test('buildDesignJsonFromContent returns versioned design json', function () {
+        $designJson = $this->blockService->buildDesignJsonFromContent('<p>Hello builder</p>');
+
+        expect($designJson)->toHaveKeys(['blocks', 'version'])
+            ->and($designJson['version'])->toBe(1)
+            ->and($designJson['blocks'])->not->toBeEmpty();
+    });
+});
+
 describe('parseBlocks', function () {
     test('parses empty blocks array', function () {
         $html = $this->blockService->parseBlocks([]);

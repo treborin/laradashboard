@@ -240,6 +240,10 @@ class SocialAuthService
             $user = $email ? User::where('email', $email)->first() : null;
 
             if (! $user) {
+                if (! filter_var(config('settings.auth_enable_public_registration', '0'), FILTER_VALIDATE_BOOLEAN)) {
+                    throw new \RuntimeException(__('New account registration is currently disabled.'));
+                }
+
                 // Create new user
                 $user = $this->createUser($socialUser);
             }

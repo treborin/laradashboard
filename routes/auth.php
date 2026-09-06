@@ -36,7 +36,7 @@ Route::group(['middleware' => 'guest'], function () {
     Route::middleware(['public.auth:register'])->group(function () {
         Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
         Route::post('register', [RegisterController::class, 'register'])
-            ->middleware(['recaptcha:registration', 'throttle:20,1']);
+            ->middleware(['recaptcha:register', 'throttle:5,60']);
     });
 
     // Password Reset Routes - Controlled by auth_enable_password_reset setting

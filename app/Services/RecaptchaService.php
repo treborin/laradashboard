@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\Http;
 
 class RecaptchaService
 {
+    /**
+     * Legacy page keys that should be treated as equivalent.
+     *
+     * @var array<string, string>
+     */
+    private const PAGE_ALIASES = [
+        'registration' => 'register',
+        'register' => 'registration',
+    ];
+
     private string $siteKey;
     private string $secretKey;
     private array $enabledPages;
@@ -33,7 +43,10 @@ class RecaptchaService
             return false;
         }
 
-        $isEnabled = in_array($page, $this->enabledPages);
+        $isEnabled = ! empty(array_intersect(
+            $this->pageKeysToCheck($page),
+            $this->enabledPages
+        ));
 
         // Apply filter hook to allow modifications
         return Hook::applyFilters(CommonFilterHook::RECAPTCHA_IS_ENABLED_FOR_PAGE, $isEnabled, $page);
@@ -81,8 +94,8 @@ class RecaptchaService
                 $score = $result['score'] ?? 0;
                 $resultAction = $result['action'] ?? '';
 
-                // Verify the action matches.
-                if ($resultAction !== $action) {
+                // Verify the action matches (allow legacy register/registration aliases).
+                if (! in_array($resultAction, $this->pageKeysToCheck($action), true)) {
                     $isValid = false;
                 }
 
@@ -139,5 +152,19 @@ class RecaptchaService
             'register' => __('Register'),
             'forgot_password' => __('Forgot Password'),
         ]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function pageKeysToCheck(string $page): array
+    {
+        $keys = [$page];
+
+        if (isset(self::PAGE_ALIASES[$page])) {
+            $keys[] = self::PAGE_ALIASES[$page];
+        }
+
+        return array_values(array_unique($keys));
     }
 }

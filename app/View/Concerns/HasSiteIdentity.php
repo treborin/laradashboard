@@ -18,7 +18,7 @@ trait HasSiteIdentity
      */
     protected function loadSiteIdentity(): void
     {
-        $this->siteName = config('app.name', 'LaraDashboard');
+        $this->siteName = config('app.name', 'Lara Dashboard');
         $this->logoLight = config('settings.site_logo_lite') ?: null;
         $this->logoDark = config('settings.site_logo_dark') ?: null;
     }

@@ -101,6 +101,11 @@ class Setting extends Model
     public const GLOBAL_CUSTOM_JS = 'global_custom_js';
 
     // =========================================================================
+    // MCP (Model Context Protocol)
+    // =========================================================================
+    public const MCP_ENABLED = 'mcp_enabled';
+
+    // =========================================================================
     // AI Integration
     // =========================================================================
     public const AI_DEFAULT_PROVIDER = 'ai_default_provider';
@@ -138,6 +143,14 @@ class Setting extends Model
     public const AUTH_ENABLE_PASSWORD_RESET = 'auth_enable_password_reset';
 
     public const AUTH_ENABLE_EMAIL_VERIFICATION = 'auth_enable_email_verification';
+
+    public const AUTH_REGISTRATION_HONEYPOT_ENABLED = 'auth_registration_honeypot_enabled';
+
+    public const AUTH_REGISTRATION_IP_LIMIT_ENABLED = 'auth_registration_ip_limit_enabled';
+
+    public const AUTH_REGISTRATION_MAX_PER_IP_PER_DAY = 'auth_registration_max_per_ip_per_day';
+
+    public const AUTH_DEFER_WELCOME_EMAIL_UNTIL_VERIFIED = 'auth_defer_welcome_email_until_verified';
 
     public const AUTH_DEFAULT_USER_ROLE = 'auth_default_user_role';
 

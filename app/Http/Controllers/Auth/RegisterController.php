@@ -9,6 +9,7 @@ use App\Enums\Hooks\AuthFilterHook;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\RegistrationWelcomeNotification;
+use App\Services\Auth\RegistrationGuardService;
 use App\Support\Facades\Hook;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -35,11 +36,9 @@ class RegisterController extends Controller
 
     use RegistersUsers;
 
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct()
-    {
+    public function __construct(
+        private readonly RegistrationGuardService $registrationGuard
+    ) {
         $this->middleware('guest');
     }
 
@@ -98,6 +97,8 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
+        $rules = array_merge($rules, $this->registrationGuard->additionalValidationRules());
+
         $messages = Hook::applyFilters(AuthFilterHook::REGISTER_VALIDATION_MESSAGES, []);
 
         return Validator::make($data, $rules, $messages);
@@ -150,13 +151,24 @@ class RegisterController extends Controller
      */
     public function register(Request $request): RedirectResponse|JsonResponse
     {
+        if ($this->registrationGuard->hasExceededIpLimit($request->ip())) {
+            return back()
+                ->withErrors([
+                    'email' => __('Too many registration attempts from your network. Please try again later.'),
+                ])
+                ->withInput($request->except('password', 'password_confirmation'));
+        }
+
         $this->validator($request->all())->validate();
 
         try {
             $user = $this->create($request->all());
 
-            // Send registration welcome email
-            $this->sendWelcomeEmail($user);
+            $this->registrationGuard->recordRegistration($request->ip());
+
+            if ($this->shouldSendWelcomeEmail()) {
+                $this->sendWelcomeEmail($user);
+            }
 
             // Only fire Registered event (which sends verification email) if:
             // 1. Email verification is enabled in settings
@@ -203,6 +215,21 @@ class RegisterController extends Controller
             // Log the error but don't fail registration
             Log::warning('Could not send welcome email: '.$e->getMessage());
         }
+    }
+
+    protected function shouldSendWelcomeEmail(): bool
+    {
+        $mailFrom = config('mail.from.address');
+
+        if (empty($mailFrom)) {
+            return false;
+        }
+
+        if ($this->shouldSendVerificationEmail() && $this->registrationGuard->shouldDeferWelcomeEmailUntilVerified()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

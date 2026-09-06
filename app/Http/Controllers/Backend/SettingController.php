@@ -16,6 +16,7 @@ use App\Services\SettingService;
 use App\Support\Facades\Hook;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
@@ -29,11 +30,15 @@ class SettingController extends Controller
     ) {
     }
 
-    public function index($tab = null): Renderable
+    public function index($tab = null): Renderable|RedirectResponse
     {
         $this->authorize('manage', Setting::class);
 
         $tab = $tab ?? request()->input('tab', 'general');
+
+        if ($tab === 'mcp') {
+            return redirect()->route('admin.settings.mcp.index');
+        }
 
         $this->setBreadcrumbTitle(__('Settings'))
             ->setBreadcrumbIcon('lucide:settings');
@@ -59,6 +64,7 @@ class SettingController extends Controller
                 'hide_default_login_url',
                 'auth_redirect_after_login',
                 'auth_redirect_after_register',
+                'mcp_enabled',
             ]);
             $fields = $request->except($restrictedFields);
         } else {
@@ -87,7 +93,14 @@ class SettingController extends Controller
         }
 
         // Handle checkbox fields that might not be present when unchecked
-        $checkboxFields = ['hide_admin_url', 'hide_default_login_url', 'error_notifications_enabled'];
+        $checkboxFields = [
+            'hide_admin_url',
+            'hide_default_login_url',
+            'error_notifications_enabled',
+            'auth_registration_honeypot_enabled',
+            'auth_registration_ip_limit_enabled',
+            'auth_defer_welcome_email_until_verified',
+        ];
         foreach ($checkboxFields as $checkboxField) {
             // Skip restricted fields in demo mode
             if (config('app.demo_mode', false) && in_array($checkboxField, $restrictedFields ?? [])) {

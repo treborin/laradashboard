@@ -96,7 +96,11 @@ Built for Laravel developers who want to ship admin dashboards, SaaS apps, CRMs 
 
 ## 📝 Changelog
 
-> **Latest release:** [v1.3.2](https://github.com/laradashboard/laradashboard/releases/tag/v1.3.2) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
+> **Latest release:** [v1.4.0](https://github.com/laradashboard/laradashboard/releases/tag/v1.4.0) • [Full changelog →](CHANGELOG.md) • [All GitHub releases](https://github.com/laradashboard/laradashboard/releases)
+
+**[v1.4.0] — 2026-09-06**
+-   **New:** MCP server for AI agents — token-based access from **Settings → MCP** with tools for content, CRM, forms, email, docs, cache, and logs.
+-   **New:** Module MCP registry (`McpFilterHook`) so installed modules can expose tools and briefing providers.
 
 **[v1.3.2] — 2026-09-06**
 -   **New:** Dashboard widget customization — per-user show/hide for stat cards and sections.

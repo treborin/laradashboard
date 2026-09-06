@@ -248,6 +248,236 @@ HTML;
     }
 
     /**
+     * Build LaraBuilder-compatible design_json from HTML or plain text content.
+     *
+     * @return array{blocks: array<int, array<string, mixed>>, version: int}
+     */
+    public function buildDesignJsonFromContent(string $content): array
+    {
+        return [
+            'blocks' => $this->buildBlocksFromHtml($content),
+            'version' => 1,
+        ];
+    }
+
+    /**
+     * Convert HTML or plain text into LaraBuilder blocks for the post editor.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function buildBlocksFromHtml(string $html): array
+    {
+        $html = trim($html);
+
+        if ($html === '') {
+            return [];
+        }
+
+        if (strip_tags($html) === $html) {
+            return $this->buildBlocksFromPlainText($html);
+        }
+
+        $document = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $document->loadHTML(
+            '<?xml encoding="UTF-8"><body>'.$html.'</body>',
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
+        libxml_clear_errors();
+
+        $body = $document->getElementsByTagName('body')->item(0);
+
+        if ($body === null) {
+            return $this->buildBlocksFromPlainText(strip_tags($html));
+        }
+
+        $blocks = [];
+
+        foreach ($body->childNodes as $node) {
+            $blocks = array_merge($blocks, $this->parseHtmlNodeToBlocks($node));
+        }
+
+        if ($blocks === []) {
+            $blocks[] = $this->text($html);
+        }
+
+        return $this->interleaveBlockSpacers($blocks);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function buildBlocksFromPlainText(string $text): array
+    {
+        $paragraphs = array_values(array_filter(
+            preg_split('/\R\s*\R/', $text) ?: [],
+            fn (string $paragraph): bool => trim($paragraph) !== ''
+        ));
+
+        if ($paragraphs === []) {
+            return [];
+        }
+
+        $blocks = [];
+
+        foreach ($paragraphs as $index => $paragraph) {
+            $paragraph = trim($paragraph);
+
+            if ($this->looksLikeSubheading($paragraph)) {
+                $blocks[] = $this->heading($paragraph, 'h2', 'left', '#333333', '22px');
+            } else {
+                $blocks[] = $this->text($paragraph);
+            }
+
+            if ($index < count($paragraphs) - 1) {
+                $blocks[] = $this->spacer('16px');
+            }
+        }
+
+        return $blocks;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function parseHtmlNodeToBlocks(\DOMNode $node): array
+    {
+        if ($node->nodeType !== XML_ELEMENT_NODE) {
+            return [];
+        }
+
+        $tag = strtolower($node->nodeName);
+
+        return match ($tag) {
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6' => [
+                $this->heading(
+                    trim($node->textContent ?? ''),
+                    $tag,
+                    'left',
+                    '#333333',
+                    $tag === 'h1' ? '28px' : '22px'
+                ),
+            ],
+            'p' => $this->buildTextBlockFromHtml($this->nodeInnerHtml($node)),
+            'ul', 'ol' => $this->buildListBlockFromHtml($node),
+            'blockquote' => [
+                $this->quote(trim($node->textContent ?? '')),
+            ],
+            'div', 'section', 'article' => $this->parseContainerNodeToBlocks($node),
+            default => [],
+        };
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function parseContainerNodeToBlocks(\DOMNode $node): array
+    {
+        $blocks = [];
+
+        foreach ($node->childNodes as $child) {
+            $blocks = array_merge($blocks, $this->parseHtmlNodeToBlocks($child));
+        }
+
+        if ($blocks !== []) {
+            return $blocks;
+        }
+
+        $innerHtml = trim($this->nodeInnerHtml($node));
+
+        if ($innerHtml === '') {
+            return [];
+        }
+
+        return $this->buildTextBlockFromHtml($innerHtml);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function buildTextBlockFromHtml(string $html): array
+    {
+        $html = trim($html);
+
+        if ($html === '') {
+            return [];
+        }
+
+        return [$this->text($html)];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function buildListBlockFromHtml(\DOMNode $node): array
+    {
+        $items = [];
+
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeType === XML_ELEMENT_NODE && strtolower($child->nodeName) === 'li') {
+                $item = trim($child->textContent ?? '');
+
+                if ($item !== '') {
+                    $items[] = $item;
+                }
+            }
+        }
+
+        if ($items === []) {
+            return [];
+        }
+
+        $listType = strtolower($node->nodeName) === 'ol' ? 'number' : 'bullet';
+
+        return [$this->listBlock($items, $listType)];
+    }
+
+    protected function nodeInnerHtml(\DOMNode $node): string
+    {
+        $html = '';
+
+        foreach ($node->childNodes as $child) {
+            $html .= $node->ownerDocument?->saveHTML($child) ?? '';
+        }
+
+        return trim($html);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $blocks
+     * @return array<int, array<string, mixed>>
+     */
+    protected function interleaveBlockSpacers(array $blocks): array
+    {
+        if ($blocks === []) {
+            return [];
+        }
+
+        $withSpacers = [];
+
+        foreach ($blocks as $index => $block) {
+            $withSpacers[] = $block;
+
+            if ($index < count($blocks) - 1 && ($block['type'] ?? null) !== 'spacer') {
+                $withSpacers[] = $this->spacer('16px');
+            }
+        }
+
+        return $withSpacers;
+    }
+
+    protected function looksLikeSubheading(string $text): bool
+    {
+        $text = trim($text);
+
+        return strlen($text) < 80
+            && ! str_ends_with($text, '.')
+            && ! str_contains($text, "\n")
+            && ! str_starts_with($text, '-')
+            && ! str_starts_with($text, '*');
+    }
+
+    /**
      * Helper: Create divider block
      */
     public function divider(string $color = '#e5e7eb', string $thickness = '1px', string $width = '100%'): array
