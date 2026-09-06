@@ -26,6 +26,9 @@ use Laravel\Mcp\Server\Attributes\Version;
     - list-posts / get-post — inspect content
     - create-post — draft LaraBuilder-compatible content (topic AI or manual title/content)
     - update-post — publish pending posts, edit drafts, or change status
+    - delete-post — remove drafts or unwanted posts/pages
+    - list-terms / assign-post-terms — categories and tags (use term IDs from list-terms)
+    - list-media / attach-featured-image — set featured images on existing posts
     - generate-seo-meta — optimize SEO for a post (requires OpenAI)
 
     CRM workflow:
@@ -49,7 +52,13 @@ use Laravel\Mcp\Server\Attributes\Version;
 
     Operations:
     - clear-cache — after settings or module changes
-    - list-logs — inspect storage log files before downloading from admin
+    - list-logs / get-log-tail — inspect and read storage log files
+    - get-site-health — Laravel version, drivers, MCP status, enabled modules
+
+    Discovery:
+    - list-mcp-tools — tools this token can actually use (respects permissions)
+    - list-modules — installed modules with enabled/disabled status and versions
+    - activate-module / deactivate-module — enable or disable installed modules (Superadmin required to activate)
     MARKDOWN)]
 class LaraDashboardServer extends Server
 {

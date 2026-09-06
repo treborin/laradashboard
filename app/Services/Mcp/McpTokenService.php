@@ -53,11 +53,18 @@ class McpTokenService
             'mcp:posts.read' => 'post.view',
             'mcp:posts.write' => 'post.create',
             'mcp:posts.update' => 'post.edit',
+            'mcp:posts.delete' => 'post.delete',
+            'mcp:terms.read' => 'term.view',
+            'mcp:media.read' => 'media.view',
             'mcp:email_templates.read' => 'email_template.view',
             'mcp:email.send' => 'email_template.view',
             'mcp:briefing.read' => 'dashboard.view',
             'mcp:ops.cache' => 'settings.edit',
             'mcp:ops.logs.read' => 'settings.edit',
+            'mcp:ops.health.read' => 'dashboard.view',
+            'mcp:modules.read' => 'module.view',
+            'mcp:modules.activate' => 'module.activate',
+            'mcp:modules.deactivate' => 'module.deactivate',
         ]);
 
         foreach ($map as $ability => $permission) {

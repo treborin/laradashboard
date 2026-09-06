@@ -50,6 +50,38 @@ class StorageLogService
     }
 
     /**
+     * Read the last N lines from a storage-relative log file.
+     *
+     * @return array{relative_path: string, lines: list<string>, line_count: int, truncated: bool}|null
+     */
+    public function getLogTail(string $relativePath, int $lines = 100): ?array
+    {
+        $absolutePath = $this->resolveLogFile($relativePath);
+
+        if ($absolutePath === null) {
+            return null;
+        }
+
+        $lines = max(1, min($lines, 1000));
+        $content = @file($absolutePath, FILE_IGNORE_NEW_LINES);
+
+        if ($content === false) {
+            return null;
+        }
+
+        $totalLines = count($content);
+        $truncated = $totalLines > $lines;
+        $tailLines = $truncated ? array_slice($content, -$lines) : $content;
+
+        return [
+            'relative_path' => str_replace('\\', '/', trim(str_replace('\\', '/', $relativePath), '/')),
+            'lines' => array_values($tailLines),
+            'line_count' => count($tailLines),
+            'truncated' => $truncated,
+        ];
+    }
+
+    /**
      * Resolve a storage-relative log path to a canonical absolute file path.
      */
     public function resolveLogFile(string $relativePath): ?string

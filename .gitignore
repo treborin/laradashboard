@@ -48,3 +48,6 @@ public/images/modules
 *.zip
 *.tar.gz
 config.bat
+
+# Exclude mcp files
+.cursor/mcp.json

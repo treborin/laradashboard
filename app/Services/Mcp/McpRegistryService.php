@@ -6,15 +6,26 @@ namespace App\Services\Mcp;
 
 use App\Enums\Hooks\McpFilterHook;
 use App\Mcp\Attributes\McpToolMeta;
-use App\Mcp\Tools\CreatePostTool;
+use App\Mcp\Tools\ActivateModuleTool;
+use App\Mcp\Tools\AssignPostTermsTool;
+use App\Mcp\Tools\AttachFeaturedImageTool;
 use App\Mcp\Tools\ClearCacheTool;
+use App\Mcp\Tools\CreatePostTool;
+use App\Mcp\Tools\DeactivateModuleTool;
+use App\Mcp\Tools\DeletePostTool;
 use App\Mcp\Tools\GenerateSeoMetaTool;
 use App\Mcp\Tools\GetDailyBriefingTool;
 use App\Mcp\Tools\GetEmailTemplateTool;
+use App\Mcp\Tools\GetLogTailTool;
 use App\Mcp\Tools\GetPostTool;
+use App\Mcp\Tools\GetSiteHealthTool;
 use App\Mcp\Tools\ListEmailTemplatesTool;
 use App\Mcp\Tools\ListLogsTool;
+use App\Mcp\Tools\ListMediaTool;
+use App\Mcp\Tools\ListMcpToolsTool;
+use App\Mcp\Tools\ListModulesTool;
 use App\Mcp\Tools\ListPostsTool;
+use App\Mcp\Tools\ListTermsTool;
 use App\Mcp\Tools\SendEmailTool;
 use App\Mcp\Tools\UpdatePostTool;
 use App\Support\Facades\Hook;
@@ -35,6 +46,11 @@ class McpRegistryService
             GetPostTool::class,
             CreatePostTool::class,
             UpdatePostTool::class,
+            DeletePostTool::class,
+            AssignPostTermsTool::class,
+            ListTermsTool::class,
+            ListMediaTool::class,
+            AttachFeaturedImageTool::class,
             GenerateSeoMetaTool::class,
             GetDailyBriefingTool::class,
             ListEmailTemplatesTool::class,
@@ -42,6 +58,12 @@ class McpRegistryService
             SendEmailTool::class,
             ClearCacheTool::class,
             ListLogsTool::class,
+            GetLogTailTool::class,
+            GetSiteHealthTool::class,
+            ListMcpToolsTool::class,
+            ListModulesTool::class,
+            ActivateModuleTool::class,
+            DeactivateModuleTool::class,
         ]);
 
         return array_values(array_unique(array_filter($tools, function (string $toolClass): bool {
