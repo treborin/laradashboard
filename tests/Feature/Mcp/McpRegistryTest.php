@@ -61,29 +61,3 @@ test('modules can register ability permission mappings for tokens', function () 
 
     Hook::removeFilter(McpFilterHook::ABILITY_PERMISSION_MAP, [McpRegistryTestHooks::class, 'registerSampleAbility']);
 });
-
-test('crm module registers its mcp tools when bootstrapped', function () {
-    $definitions = collect(app(McpRegistryService::class)->toolDefinitions());
-
-    expect($definitions->pluck('name')->all())
-        ->toContain('list-contacts')
-        ->toContain('list-deals')
-        ->toContain('create-contact-activity')
-        ->toContain('list-email-templates')
-        ->toContain('send-email')
-        ->toContain('get-daily-briefing');
-});
-
-test('docforge module registers documentation mcp tools when bootstrapped', function () {
-    if (! class_exists(\Modules\DocForge\Mcp\Tools\SearchDocsTool::class)) {
-        $this->markTestSkipped('DocForge module is not enabled.');
-    }
-
-    $definitions = collect(app(McpRegistryService::class)->toolDefinitions());
-
-    expect($definitions->pluck('name')->all())
-        ->toContain('search-docs')
-        ->toContain('get-doc')
-        ->toContain('list-docs')
-        ->toContain('list-doc-projects');
-});

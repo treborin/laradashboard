@@ -239,5 +239,6 @@ test('list modules mcp tool returns installed modules', function () {
     LaraDashboardServer::actingAs($this->user, 'sanctum')
         ->tool(ListModulesTool::class, [])
         ->assertOk()
-        ->assertSee('modules');
+        ->assertSee('data')
+        ->assertSee('total');
 });
